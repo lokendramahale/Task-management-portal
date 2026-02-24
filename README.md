@@ -120,7 +120,7 @@ This project was developed with integrated use of multiple AI tools:
 **Prompt 1 — System architecture & planning**
 > "You are a senior full-stack architect. Design a simple Task Management Portal using React (Vite) for frontend, NestJS for backend, and MongoDB. Include JWT authentication, task creation (title required, description optional, status, createdAt), task list view, toggle completed, and filtering (all/pending/completed). Provide folder structure, data model, API endpoints, authentication flow, and React state management approach suitable for a coding assignment."
 
-**Prompt 2 — NestJS backend scaffold**
+**Prompt 2 — NestJS backend**
 > "Generate a NestJS backend for a Task Management Portal using MongoDB (Mongoose). Include User schema (email, password hashed) and Task schema (title, description, status, createdAt, userId). Implement JWT authentication, Auth module (register/login), Task module (CRUD and toggle status), and protect task routes with JWT guards. Provide schemas, DTOs, controllers, services, and JWT strategy using beginner-friendly best practices."
 
 **Prompt 3 — Authentication implementation**
@@ -129,7 +129,7 @@ This project was developed with integrated use of multiple AI tools:
 **Prompt 4 — MongoDB task schema design**
 > "Design a MongoDB Mongoose schema for a Task Management Portal. Task fields: title (required), description (optional), status (pending/completed default pending), createdAt auto, userId reference. Suggest useful indexes and validation rules."
 
-**Prompt 5 — React frontend scaffold**
+**Prompt 5 — React frontend**
 > "Create a React (Vite) frontend for a Task Management Portal with pages: Login, Register, and Dashboard. Features: add task form, task list display, toggle completed, filter all/pending/completed, show created date, JWT auth stored in localStorage. Use functional components, hooks, Axios for API calls, and minimal clean UI."
 
 **Prompt 6 — React state management suggestion**
@@ -144,14 +144,8 @@ This project was developed with integrated use of multiple AI tools:
 **Prompt 9 — Filtering logic**
 > "Implement task filtering in React with filters All, Pending, Completed. Include filter buttons, active state styling, and derived filteredTasks list using hooks. Keep logic simple."
 
-**Prompt 10 — Validation & edge cases**
-> "Suggest validation and edge cases for a Task Management Portal including backend DTO validation, frontend form validation, auth errors, empty task title, unauthorized access, and task ownership checks for NestJS + React."
-
-**Prompt 11 — README generation**
+**Prompt 10 — README generation**
 > "Generate a professional README for a Task Management Portal built with React (Vite), NestJS, and MongoDB including features, setup steps, environment variables, API overview, folder structure, and AI usage declaration suitable for a coding assignment."
-
-**Prompt 12 — AI usage declaration**
-> "Write an AI usage declaration stating AI was used for scaffolding and boilerplate, while API design and state management were written manually, and confirming full understanding of the code in a professional tone."
 
 ---
 
