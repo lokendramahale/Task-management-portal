@@ -63,7 +63,7 @@ A full-stack task management application built with **NestJS**, **React (Vite)**
 ### 1. Clone the project
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/lokendramahale/Task-management-portal.git
 cd task-portal
 ```
 
@@ -78,8 +78,8 @@ cp .env.example .env
 Open `.env` and fill in your values:
 
 ```env
-MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/task-portal
-JWT_SECRET=any-long-random-string
+MONGODB_URI=mongodb+srv://lokendramahale3_db_user:Kwd4G6a0Bh3iXNhO@cluster0.jufxyxg.mongodb.net/?appName=Cluster0
+JWT_SECRET=9c7f4d8b2e0a6f5b3c1d9e7a4f8b2c6d1e3f5a7c9b0d2e4f6a8c1b3d5e7f9a2
 JWT_EXPIRES_IN=7d
 PORT=3000
 FRONTEND_URL=http://localhost:5173
@@ -103,6 +103,15 @@ npm run dev
 
 > Frontend runs at `http://localhost:5173`
 > Vite automatically proxies all `/api` calls to the backend — no extra config needed.
+
+---
+
+## AI Tools Used
+
+This project was developed with integrated use of multiple AI tools:
+- **Claude AI** — Code generation and architecture implementation
+- **Chat GPT** — Enhanced prompts and better solution refinement
+- **GitHub Copilot** — Bug fixing and code completion
 
 ---
 
@@ -168,8 +177,6 @@ npm run dev
 
 ## API Design
 
-> Non-AI generated — designed and documented manually.
-
 I kept the API straightforward and REST-ful. Every endpoint does one clear thing, and all task routes are scoped to the authenticated user so there's no way to accidentally touch someone else's data.
 
 **Base URL:** `/api`
@@ -185,10 +192,10 @@ Creates a new account and immediately returns a token — the user doesn't need 
 
 ```json
 Request:
-{ "name": "John Doe", "email": "john@example.com", "password": "mypassword" }
+{ "name": "Lokendra Mahale", "email": "lokendra@gmail.com", "password": "123456" }
 
 Response 201:
-{ "access_token": "eyJhbGci...", "user": { "_id": "...", "name": "John Doe", "email": "john@example.com" } }
+{ "access_token": "eyJhbGci...", "user": { "_id": "...", "name": "Lokendra Mahale", "email": "lokendra@gmail.com" } }
 ```
 
 #### `POST /api/auth/login`
@@ -197,10 +204,10 @@ Validates credentials and returns a token. Returns `200` (not `201`) since nothi
 
 ```json
 Request:
-{ "email": "john@example.com", "password": "mypassword" }
+{ "email": "lokendra@gmail.com", "password": "123456" }
 
 Response 200:
-{ "access_token": "eyJhbGci...", "user": { "_id": "...", "name": "John Doe", "email": "john@example.com" } }
+{ "access_token": "eyJhbGci...", "user": { "_id": "...", "name": "Lokendra Mahale", "email": "lokendra@gmail.com" } }
 ```
 
 ---
@@ -257,8 +264,6 @@ I gave `toggle` its own endpoint instead of bundling it into the general PATCH. 
 ---
 
 ## State Management
-
-> Non-AI generated — architecture designed and documented manually.
 
 I went with React Context and useState rather than pulling in Redux or Zustand. For an app this size, a full state management library would be overkill — the data flow is simple enough that Context handles it cleanly without the extra boilerplate.
 
