@@ -33,7 +33,11 @@ export default function AddTaskModal({ task = null, onSubmit, onClose }) {
     if (Object.keys(v).length > 0) { setErrors(v); return; }
     setLoading(true);
     try {
-      const payload = { title: form.title.trim(), description: form.description.trim(), priority: form.priority };
+      const payload = {
+        title: form.title.trim(),
+        description: form.description.trim(),
+        priority: form.priority,
+      };
       if (form.dueDate) payload.dueDate = form.dueDate;
       await onSubmit(payload);
       onClose();
@@ -51,47 +55,72 @@ export default function AddTaskModal({ task = null, onSubmit, onClose }) {
       <div className="modal" role="dialog" aria-modal="true">
         <div className="modal-header">
           <h2 className="modal-title">{isEdit ? 'Edit task' : 'New task'}</h2>
-          <button className="btn btn-ghost btn-icon" onClick={onClose} aria-label="Close">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <button className="modal-close" onClick={onClose} aria-label="Close">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
               <path d="M18 6 6 18M6 6l12 12"/>
             </svg>
           </button>
         </div>
 
-        {errors.submit && <div className="global-error">{errors.submit}</div>}
+        {errors.submit && <div className="alert-error">{errors.submit}</div>}
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label className="form-label" htmlFor="modal-title">Title *</label>
-            <input id="modal-title" name="title" type="text" className="form-input"
-              placeholder="What needs to be done?" value={form.title} onChange={handleChange} autoFocus maxLength={120} />
+            <label className="form-label" htmlFor="t-title">Title *</label>
+            <input
+              id="t-title"
+              name="title"
+              type="text"
+              className="form-input"
+              placeholder="What needs to be done?"
+              value={form.title}
+              onChange={handleChange}
+              autoFocus
+              maxLength={120}
+            />
             {errors.title && <p className="form-error">{errors.title}</p>}
           </div>
 
           <div className="form-group">
-            <label className="form-label" htmlFor="modal-desc">Description</label>
-            <textarea id="modal-desc" name="description" className="form-textarea"
-              placeholder="Add more context (optional)..." value={form.description} onChange={handleChange} maxLength={1000} />
+            <label className="form-label" htmlFor="t-desc">Description</label>
+            <textarea
+              id="t-desc"
+              name="description"
+              className="form-textarea"
+              placeholder="Add details (optional)..."
+              value={form.description}
+              onChange={handleChange}
+              maxLength={1000}
+            />
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+          <div className="form-row">
             <div className="form-group" style={{ margin: 0 }}>
-              <label className="form-label" htmlFor="modal-priority">Priority</label>
-              <select id="modal-priority" name="priority" className="form-select" value={form.priority} onChange={handleChange}>
+              <label className="form-label" htmlFor="t-priority">Priority</label>
+              <select id="t-priority" name="priority" className="form-select" value={form.priority} onChange={handleChange}>
                 <option value="low">Low</option>
                 <option value="medium">Medium</option>
                 <option value="high">High</option>
               </select>
             </div>
+
             <div className="form-group" style={{ margin: 0 }}>
-              <label className="form-label" htmlFor="modal-due">Due Date</label>
-              <input id="modal-due" name="dueDate" type="date" className="form-input"
-                value={form.dueDate} onChange={handleChange} style={{ colorScheme: 'dark' }} />
+              <label className="form-label" htmlFor="t-due">Due Date</label>
+              <input
+                id="t-due"
+                name="dueDate"
+                type="date"
+                className="form-input"
+                value={form.dueDate}
+                onChange={handleChange}
+              />
             </div>
           </div>
 
           <div className="modal-actions">
-            <button type="button" className="btn btn-secondary" onClick={onClose}>Cancel</button>
+            <button type="button" className="btn btn-secondary" onClick={onClose}>
+              Cancel
+            </button>
             <button type="submit" className="btn btn-primary" disabled={loading}>
               {loading ? <span className="spinner" /> : (isEdit ? 'Save changes' : 'Add task')}
             </button>

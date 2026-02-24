@@ -1,16 +1,29 @@
 import { useState, useEffect, useCallback } from 'react';
 import api from '../api/axios';
+import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
 import TaskCard from '../components/TaskCard';
 import AddTaskModal from '../components/AddTaskModal';
 
+/** Returns "Good morning", "Good afternoon", or "Good evening" */
+function getGreeting() {
+  const h = new Date().getHours();
+  if (h < 12) return 'Good morning';
+  if (h < 18) return 'Good afternoon';
+  return 'Good evening';
+}
+
 export default function Dashboard() {
+  const { user } = useAuth();
+
   const [tasks, setTasks]   = useState([]);
   const [stats, setStats]   = useState({ total: 0, completed: 0, pending: 0 });
   const [filter, setFilter] = useState('all');
   const [modal, setModal]   = useState({ open: false, mode: 'create', task: null });
   const [loading, setLoading] = useState(true);
   const [error, setError]   = useState('');
+
+  // ── Fetchers ──────────────────────────────────────────────────
 
   const fetchStats = useCallback(async () => {
     const { data } = await api.get('/tasks/stats');
@@ -41,6 +54,8 @@ export default function Dashboard() {
     fetchTasks(newFilter);
   };
 
+  // ── Task operations ───────────────────────────────────────────
+
   const handleCreate = async (payload) => {
     const { data } = await api.post('/tasks', payload);
     setTasks((prev) => [data, ...prev]);
@@ -54,9 +69,10 @@ export default function Dashboard() {
   };
 
   const handleToggle = async (id) => {
-    // Optimistic update — flip before server confirms
     const snapshot = tasks;
     const task = tasks.find((t) => t._id === id);
+
+    // Optimistic flip
     setTasks((prev) => prev.map((t) =>
       t._id === id
         ? { ...t, status: t.status === 'pending' ? 'completed' : 'pending',
@@ -70,17 +86,18 @@ export default function Dashboard() {
         pending:   task.status === 'pending' ? s.pending   - 1 : s.pending   + 1,
       }));
     }
+
     try {
       const { data } = await api.patch(`/tasks/${id}/toggle`);
       setTasks((prev) => prev.map((t) => (t._id === id ? data : t)));
     } catch {
-      setTasks(snapshot); // Rollback
+      setTasks(snapshot);
       await fetchStats();
     }
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Delete this task? This cannot be undone.')) return;
+    if (!window.confirm('Delete this task?')) return;
     const deletedTask = tasks.find((t) => t._id === id);
     setTasks((prev) => prev.filter((t) => t._id !== id));
     setStats((prev) => ({
@@ -92,9 +109,11 @@ export default function Dashboard() {
     try {
       await api.delete(`/tasks/${id}`);
     } catch {
-      await loadAll(); // Rollback
+      await loadAll();
     }
   };
+
+  // ── Modal helpers ─────────────────────────────────────────────
 
   const openCreate = () => setModal({ open: true, mode: 'create', task: null });
   const openEdit   = (task) => setModal({ open: true, mode: 'edit', task });
@@ -105,76 +124,126 @@ export default function Dashboard() {
     else await handleCreate(payload);
   };
 
+  // ── Render ────────────────────────────────────────────────────
+
+  const firstName = user?.name?.split(' ')[0] || 'there';
+
   const filters = [
-    { key: 'all',       label: `All (${stats.total})` },
-    { key: 'pending',   label: `Pending (${stats.pending})` },
-    { key: 'completed', label: `Done (${stats.completed})` },
+    { key: 'all',       label: 'All' },
+    { key: 'pending',   label: 'Pending' },
+    { key: 'completed', label: 'Completed' },
   ];
 
   return (
     <div className="dashboard">
       <Navbar />
 
-      <div className="stats-bar">
-        <div className="stat-block">
-          <div className="stat-value amber">{stats.total}</div>
-          <div className="stat-label">Total Tasks</div>
-        </div>
-        <div className="stat-block">
-          <div className="stat-value muted">{stats.pending}</div>
-          <div className="stat-label">Pending</div>
-        </div>
-        <div className="stat-block">
-          <div className="stat-value green">{stats.completed}</div>
-          <div className="stat-label">Completed</div>
-        </div>
-      </div>
+      <main className="dashboard-main">
+        {error && <div className="alert-error">{error}</div>}
 
-      <main className="main-content">
-        {error && <div className="global-error">{error}</div>}
+        {/* Greeting + stats */}
+        <div className="greeting">
+          <div className="greeting-left">
+            <h1 className="greeting-text">
+              {getGreeting()},{' '}
+              <span className="muted">
+                you have {stats.pending} pending {stats.pending === 1 ? 'task' : 'tasks'}.
+              </span>
+            </h1>
 
+            {/* Stat pills */}
+            <div className="stat-pills">
+              <div className="stat-pill">
+                <span className="stat-pill-dot total" />
+                {stats.total} Total
+              </div>
+              <div className="stat-pill">
+                <span className="stat-pill-dot pending" />
+                {stats.pending} Pending
+              </div>
+              <div className="stat-pill">
+                <span className="stat-pill-dot completed" />
+                {stats.completed} Completed
+              </div>
+            </div>
+          </div>
+
+          {/* Add task button */}
+          <button className="btn btn-primary" onClick={openCreate} style={{ flexShrink: 0 }}>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+              <path d="M12 5v14M5 12h14"/>
+            </svg>
+            Add Task
+          </button>
+        </div>
+
+        {/* Toolbar: filter tabs */}
         <div className="toolbar">
-          <h2 className="toolbar-title">Tasks</h2>
           <div className="filter-tabs" role="tablist">
             {filters.map(({ key, label }) => (
-              <button key={key} role="tab" aria-selected={filter === key}
+              <button
+                key={key}
+                role="tab"
+                aria-selected={filter === key}
                 className={`filter-tab ${filter === key ? 'active' : ''}`}
-                onClick={() => handleFilterChange(key)}>
+                onClick={() => handleFilterChange(key)}
+              >
                 {label}
               </button>
             ))}
           </div>
-          <button className="btn btn-primary btn-sm" onClick={openCreate}>+ New task</button>
         </div>
 
+        {/* Task list */}
         {loading ? (
-          <div style={{ textAlign: 'center', padding: 60 }}>
-            <div className="spinner" style={{ margin: '0 auto', width: 28, height: 28 }} />
+          <div style={{ textAlign: 'center', padding: '72px 0', color: 'var(--ink-4)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
+            <div className="spinner" style={{ borderColor: 'var(--ink-5)', borderTopColor: 'var(--ink-3)' }} />
+            Loading tasks...
           </div>
         ) : tasks.length === 0 ? (
           <div className="empty-state">
-            <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2M12 12v4M10 14h4"/>
-            </svg>
-            <h3>No tasks here</h3>
-            <p>{filter === 'all' ? 'Add your first task to get started.' : `No ${filter} tasks.`}</p>
+            <div className="empty-state-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--ink-4)" strokeWidth="1.5" strokeLinecap="round">
+                <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+              </svg>
+            </div>
+            <h3>No tasks yet</h3>
+            <p>
+              {filter === 'all'
+                ? 'Create your first task to get started.'
+                : `No ${filter} tasks found.`}
+            </p>
             {filter === 'all' && (
-              <button className="btn btn-primary btn-sm" style={{ marginTop: 16 }} onClick={openCreate}>
-                + Create task
+              <button className="btn btn-primary btn-sm" onClick={openCreate}>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                  <path d="M12 5v14M5 12h14"/>
+                </svg>
+                Add Task
               </button>
             )}
           </div>
         ) : (
           <div className="task-list">
             {tasks.map((task) => (
-              <TaskCard key={task._id} task={task} onToggle={handleToggle} onEdit={openEdit} onDelete={handleDelete} />
+              <TaskCard
+                key={task._id}
+                task={task}
+                onToggle={handleToggle}
+                onEdit={openEdit}
+                onDelete={handleDelete}
+              />
             ))}
           </div>
         )}
       </main>
 
+      {/* Modal */}
       {modal.open && (
-        <AddTaskModal task={modal.task} onSubmit={handleModalSubmit} onClose={closeModal} />
+        <AddTaskModal
+          task={modal.task}
+          onSubmit={handleModalSubmit}
+          onClose={closeModal}
+        />
       )}
     </div>
   );
