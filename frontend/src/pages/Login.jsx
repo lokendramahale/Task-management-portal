@@ -31,30 +31,53 @@ export default function Login() {
   return (
     <div className="auth-page">
       <div className="auth-card">
-        <div className="auth-logo">Task<span>Portal</span></div>
-        <div className="auth-subtitle">// productivity without noise</div>
-        <h1 className="auth-title">Sign in</h1>
-        <p style={{ color: 'var(--text-secondary)', marginBottom: 28, fontSize: 14 }}>
-          Enter your credentials to access your tasks.
-        </p>
-        {error && <div className="global-error">{error}</div>}
+        {/* Logo */}
+        <div className="auth-logo">
+          <div className="auth-logo-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M9 11l3 3L22 4" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+          <span className="auth-logo-name">TaskPortal</span>
+        </div>
+
+        <h1 className="auth-heading">Welcome back</h1>
+        <p className="auth-subheading">Sign in to your account to continue.</p>
+
+        {error && <div className="alert-error">{error}</div>}
+
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label className="form-label" htmlFor="email">Email</label>
-            <input id="email" name="email" type="email" className="form-input"
-              placeholder="you@example.com" value={form.email} onChange={handleChange} required autoFocus />
+            <label className="form-label" htmlFor="email">Email address</label>
+            <input
+              id="email" name="email" type="email" className="form-input"
+              placeholder="you@example.com" value={form.email}
+              onChange={handleChange} required autoFocus
+            />
           </div>
+
           <div className="form-group">
             <label className="form-label" htmlFor="password">Password</label>
-            <input id="password" name="password" type="password" className="form-input"
-              placeholder="••••••••" value={form.password} onChange={handleChange} required />
+            <input
+              id="password" name="password" type="password" className="form-input"
+              placeholder="Enter your password" value={form.password}
+              onChange={handleChange} required
+            />
           </div>
-          <button type="submit" className="btn btn-primary btn-full" disabled={loading} style={{ marginTop: 8 }}>
-            {loading ? <span className="spinner" /> : 'Sign in →'}
+
+          <button
+            type="submit"
+            className="btn btn-primary btn-full"
+            disabled={loading}
+            style={{ marginTop: 8 }}
+          >
+            {loading ? <span className="spinner" /> : 'Sign in'}
           </button>
         </form>
+
         <div className="auth-switch">
-          No account? <Link to="/register">Create one</Link>
+          Don't have an account? <Link to="/register">Sign up</Link>
         </div>
       </div>
     </div>
